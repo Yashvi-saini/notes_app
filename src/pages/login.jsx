@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useNavigate } from 'react-router-dom'
@@ -9,36 +8,14 @@ export default function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
-
- /* const handleAuth = async (e) => {
-  e.preventDefault()
-  const cleanedEmail = email.trim()
-  const cleanedPassword = password.trim()
-
-  let result
-  if (isSignUp) {
-    result = await supabase.auth.signUp({
-      email: cleanedEmail,
-      password: cleanedPassword,
-    })
-  } else {
-    result = await supabase.auth.signInWithPassword({
-      email: cleanedEmail,
-      password: cleanedPassword,
-    })
-  }
-
-  if (result.error) setError(result.error.message)
-  else navigate('/')
-}*/
 const handleAuth = async (e) => {
   e.preventDefault()
 
-  // Sanitize email and password inputs
+  //email and password inputs
   const cleanedEmail = email.trim().replace(/"/g, '')
   const cleanedPassword = password.trim()
 
-  // Extra validation (optional but recommended)
+  // Extra validation
   const isValidEmail = /^[^\s@"]+@[^\s@"]+\.[^\s@"]+$/.test(cleanedEmail)
   if (!isValidEmail) {
     setError('Invalid email format.')
@@ -70,37 +47,58 @@ const handleAuth = async (e) => {
 }
 
 
-
-
   return (
-    <div className="p-8 max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">{isSignUp ? 'Sign Up' : 'Log In'}</h2>
-      <form onSubmit={handleAuth} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+  <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
+    <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+      {isSignUp ? 'Create an Account' : 'Welcome Back'}
+    </h2>
+
+    <form onSubmit={handleAuth} className="space-y-5">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Email</label>
         <input
           type="email"
-          placeholder="Email"
-          className="w-full p-2 border"
+          placeholder="you@example.com"
+          className="w-full mt-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Password</label>
         <input
           type="password"
-          placeholder="Password"
-          className="w-full p-2 border"
+          placeholder="••••••••"
+          className="w-full mt-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        {error && <p className="text-red-500">{error}</p>}
-        <button className="bg-blue-600 text-white px-4 py-2 rounded w-full">
-          {isSignUp ? 'Create Account' : 'Log In'}
-        </button>
-      </form>
-      <p className="mt-4 text-sm text-center">
-        {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-        <button className="underline" onClick={() => setIsSignUp(!isSignUp)}>
-          {isSignUp ? 'Log in' : 'Sign up'}
-        </button>
-      </p>
-    </div>
+      </div>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      <button
+        type="submit"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded transition duration-150"
+      >
+        {isSignUp ? 'Sign Up' : 'Log In'}
+      </button>
+    </form>
+
+    <p className="mt-6 text-sm text-center text-gray-600">
+      {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+      <button
+        type="button"
+        onClick={() => setIsSignUp(!isSignUp)}
+        className="text-blue-600 hover:underline font-medium"
+      >
+        {isSignUp ? 'Log in' : 'Sign up'}
+      </button>
+    </p>
+  </div>
+</div>
+
   )
 }
