@@ -1,16 +1,94 @@
-# React + Vite
+# 📝 AI Notes App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, AI-powered notes app built with **React**, using:
 
-Currently, two official plugins are available:
+-  **Supabase** for user authentication  
+-  **Google Gemini API** for smart note actions: Summarize, Rewrite, Explain, and Generate Title  
+-  Local state-based note saving for quick note-taking  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+##  Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-  **User Authentication** via Supabase (sign in, sign out)
+-  **Create & Save Notes** with title, content, and timestamp
+-  **AI Actions** powered by Gemini:
+  - ✅ Summarize long notes into concise text
+  - ✅ Rewrite notes clearly and professionally
+  - ✅ Explain complex content in simpler terms
+  - ✅ Generate a smart title for your note
+- 🔍 **Search Notes** by title
+- 🗑️ **Delete Notes** individually
+- 🎨 Clean, responsive UI with Tailwind CSS
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+##  Tech Stack
+
+- **Frontend:** React + Vite  
+- **Styling:** Tailwind CSS  
+- **Auth:** Supabase Auth  
+- **AI Integration:** Google Gemini API (`gemini-2.0-flash` model)
+
+---
+## 🔗 Supabase Setup
+
+1. Go to [https://supabase.com/](https://supabase.com/) and create a new project.
+2. Go to **Project Settings → API** and copy:
+   - Project URL → `VITE_SUPABASE_URL`
+   - anon/public API key → `VITE_SUPABASE_ANON_KEY`
+3. In **Authentication → Settings → Email**, enable "Email and Password" sign-in.
+
+> You don’t need a database table for notes unless you want to persist them.
+
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   └── Notes.jsx         # Main Notes UI
+├── utils/
+│   ├── gemini.js         # Handles Gemini API prompts & responses
+│   └── supabaseClient.js # Supabase setup
+├── App.jsx
+└── main.jsx
+```
+
+---
+
+##  AI Prompt Types
+
+| Action     | Prompt Sent to Gemini                                      |
+|------------|-------------------------------------------------------------|
+| Summarize  | Summarize this text in plain text (no formatting)...        |
+| Rewrite    | Rewrite this note clearly and professionally...             |
+| Explain    | Explain this note in simpler terms...                       |
+| Title      | Generate a short, clear title in plain text only...         |
+
+> Responses are automatically cleaned to remove any markdown formatting.
+
+---
+
+##  AI Cleaning Logic
+
+All responses from Gemini are cleaned using a generic formatter that removes:
+- Markdown bullets (`*`, `-`)
+- Bold/italic (`**text**`, `*text*`)
+- Special symbols like `` ` ``, `#`, `>`
+
+So you're always working with **clean, plain text**.
+
+---
+
+##  To Do / Future Improvements
+
+- [ ] Store notes in Supabase for real-time sync
+- [ ] Add note editing
+- [ ] Export notes to PDF or Markdown
+- [ ] Add mobile enhancements and responsiveness
+- [ ] Add tags or categories for notes
+
+---
+
