@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import { supabase } from '../supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import { runGeminiTask } from '../utils/gemini'
@@ -11,6 +11,24 @@ export default function Notes() {
   const [notes, setNotes] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
+  useEffect(() => {
+  fetchNotes()
+}, [])
+
+const fetchNotes = async () => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return navigate('/login')
+
+  const { data, error } = await supabase
+    .from('notes')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error) console.error('Error fetching notes:', error)
+  else setNotes(data)
+}
+
 
 const extractFirstTitle = (text) => {
   const match = text.match(/\*+\s*\*?(.+?)\*?\s*$/m) // match first * Title *
@@ -51,24 +69,38 @@ const extractFirstTitle = (text) => {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   }
 
-  const handleSaveNote = () => {
-    if (!title.trim() || !note.trim()) return
-    const newNote = {
-      id: generateId(),
-      title,
-      content: note,
-      date: new Date().toLocaleString()
-    }
-    setNotes([newNote, ...notes])
-    setNote('')
-    setTitle('')
-    setOutput('')
+ const handleSaveNote = async () => {
+  if (!title.trim() || !note.trim()) return
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return navigate('/login')
+
+  const { data, error } = await supabase
+    .from('notes')
+    .insert([{ title, content: note, user_id: user.id }])
+    .select()
+
+  if (error) {
+    console.error('Error saving note:', error)
+    return
   }
 
-  const handleDeleteNote = (id) => {
-    setNotes(notes.filter((n) => n.id !== id))
-  }
+  setNotes([data[0], ...notes])
+  setNote('')
+  setTitle('')
+  setOutput('')
+}
 
+const handleDeleteNote = async (id) => {
+  const { error } = await supabase.from('notes').delete().eq('id', id)
+  if (error) {
+    console.error('Error deleting note:', error)
+    return
+  }
+  setNotes(notes.filter((n) => n.id !== id))
+}
+
+  
   const filteredNotes = notes.filter((n) =>
     n.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
